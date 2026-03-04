@@ -257,7 +257,7 @@
         historial.push(cita);
         localStorage.setItem('luxeeAgendaFinalV10', JSON.stringify(historial));
 
-        const miTelefono = "573000000000"; 
+        const miTelefono = "573142245541"; 
         const texto = `✨ *NUEVA CITA LUXEE STUDIO* ✨\n\n👤 *Clienta:* ${cita.nombre}\n📞 *Tel:* ${cita.telefono}\n💆‍♀️ *Servicios:* ${cita.servicios}\n📅 *Fecha:* ${cita.fecha}\n⏰ *Hora:* ${cita.hora}`;
         
         window.open(`https://wa.me/${miTelefono}?text=${encodeURIComponent(texto)}`, '_blank');
@@ -296,3 +296,4 @@
 </script>
 </body>
 </html>
+
