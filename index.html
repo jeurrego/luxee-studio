@@ -306,7 +306,7 @@
         historial.push(cita);
         localStorage.setItem('luxeeAgendaFinalV11', JSON.stringify(historial));
 
-        const miTelefono = "573000000000"; // ASEGÚRATE DE QUE ESTE SEA EL NÚMERO REAL
+        const miTelefono = "573142245541"; // ASEGÚRATE DE QUE ESTE SEA EL NÚMERO REAL
         const texto = `✨ *NUEVA CITA LUXEE STUDIO* ✨\n\n👤 *Clienta:* ${cita.nombre}\n📞 *Tel:* ${cita.telefono}\n💆‍♀️ *Servicios:* ${cita.servicios}\n📅 *Fecha:* ${cita.fecha}\n⏰ *Hora:* ${cita.hora}`;
         
         window.open(`https://wa.me/${miTelefono}?text=${encodeURIComponent(texto)}`, '_blank');
@@ -352,3 +352,4 @@
 </script>
 </body>
 </html>
+
