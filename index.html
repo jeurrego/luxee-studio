@@ -237,4 +237,62 @@
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        let
+        let serviciosArr = Array.from(document.querySelectorAll('input[name="srv"]:checked')).map(cb => cb.value);
+        if (serviciosArr.length === 0) return alert("Selecciona un servicio.");
+
+        if (checkOtros.checked) {
+            const index = serviciosArr.indexOf("Otros");
+            serviciosArr[index] = `Otros: ${detalleOtros.value}`;
+        }
+
+        const cita = {
+            nombre: document.getElementById('nombre').value,
+            telefono: document.getElementById('telCliente').value,
+            servicios: serviciosArr.join(" / "),
+            fecha: document.getElementById('fecha').value,
+            hora: document.getElementById('hora').value
+        };
+
+        let historial = JSON.parse(localStorage.getItem('luxeeAgendaFinalV10')) || [];
+        historial.push(cita);
+        localStorage.setItem('luxeeAgendaFinalV10', JSON.stringify(historial));
+
+        const miTelefono = "573000000000"; 
+        const texto = `✨ *NUEVA CITA LUXEE STUDIO* ✨\n\n👤 *Clienta:* ${cita.nombre}\n📞 *Tel:* ${cita.telefono}\n💆‍♀️ *Servicios:* ${cita.servicios}\n📅 *Fecha:* ${cita.fecha}\n⏰ *Hora:* ${cita.hora}`;
+        
+        window.open(`https://wa.me/${miTelefono}?text=${encodeURIComponent(texto)}`, '_blank');
+        document.getElementById('modalGracias').style.display = 'flex';
+        form.reset();
+        detalleOtros.style.display = 'none';
+        mostrarCitas();
+    });
+
+    let clics = 0;
+    titulo.addEventListener('click', () => {
+        clics++;
+        if (clics === 3) { admin.style.display = 'block'; admin.scrollIntoView({ behavior: 'smooth' }); clics = 0; }
+    });
+
+    function mostrarCitas() {
+        let historial = JSON.parse(localStorage.getItem('luxeeAgendaFinalV10')) || [];
+        const tabla = document.getElementById('cuerpoTabla');
+        tabla.innerHTML = "";
+        historial.reverse().forEach(c => {
+            tabla.innerHTML += `<tr><td>${c.fecha} ${c.hora}</td><td>${c.nombre}</td><td>${c.telefono}</td><td>${c.servicios}</td></tr>`;
+        });
+    }
+
+    function exportarExcel() {
+        let historial = JSON.parse(localStorage.getItem('luxeeAgendaFinalV10')) || [];
+        if(historial.length === 0) return;
+        let csvContent = "data:text/csv;charset=utf-8,Fecha,Nombre,Telefono,Servicios\n";
+        historial.forEach(c => { csvContent += `${c.fecha} ${c.hora},${c.nombre},${c.telefono},"${c.servicios}"\n`; });
+        const link = document.createElement("a");
+        link.setAttribute("href", encodeURI(csvContent));
+        link.setAttribute("download", "agenda_luxee.csv");
+        document.body.appendChild(link);
+        link.click();
+    }
+</script>
+</body>
+</html>
