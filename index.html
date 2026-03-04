@@ -62,7 +62,17 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
         }
 
-        h3 { color: var(--negro); border-bottom: 2px solid var(--dorado); display: inline-block; padding-bottom: 5px; margin-top: 0; }
+        /* Título de sección único y elegante */
+        .seccion-titulo { 
+            color: var(--negro); 
+            border-bottom: 2px solid var(--dorado); 
+            display: inline-block; 
+            padding-bottom: 5px; 
+            margin: 0 0 20px 0; 
+            font-size: 1.3em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
         
         .servicios-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 10px; }
         .servicio-option { 
@@ -95,10 +105,11 @@
             border-radius: 10px; 
             text-transform: uppercase;
             transition: 0.3s;
+            font-size: 1em;
         }
         .btn-whatsapp:hover { background: var(--dorado); color: var(--negro); }
 
-        /* ESTILOS DEL MENSAJE DE AGRADECIMIENTO (MODAL) */
+        /* MODAL DE AGRADECIMIENTO */
         #modalGracias {
             display: none;
             position: fixed;
@@ -119,11 +130,11 @@
         .modal-content h2 { color: var(--dorado); margin-top: 0; }
         .btn-cerrar {
             background: var(--negro); color: var(--dorado);
-            border: none; padding: 10px 20px; border-radius: 5px;
+            border: none; padding: 12px 25px; border-radius: 8px;
             margin-top: 20px; cursor: pointer; font-weight: bold;
         }
 
-        /* Estilos Agenda Privada */
+        /* AGENDA PRIVADA */
         #seccionAdmin { 
             display: none; max-width: 95%; margin: 40px auto; padding: 20px; background: white; border-radius: 15px; overflow-x: auto; 
         }
@@ -143,7 +154,7 @@
 </header>
 
 <div class="container">
-    <h3>Reservar Cita</h3>
+    <h3 class="seccion-titulo">Reservar tu Cita</h3>
     <form id="reservaForm">
         <label>Nombre Completo</label>
         <input type="text" id="nombre" placeholder="Tu nombre" required>
@@ -168,7 +179,7 @@
             <input type="time" id="hora" required>
         </div>
 
-        <button type="submit" class="btn-whatsapp">RESERVAR POR WHATSAPP 📱</button>
+        <button type="submit" class="btn-whatsapp">AGENDAR POR WHATSAPP 📱</button>
     </form>
 </div>
 
@@ -176,13 +187,13 @@
     <div class="modal-content">
         <h2>¡Gracias! ✨</h2>
         <p>Tu solicitud ha sido generada con éxito.</p>
-        <p><strong>Por favor, pulsa "Enviar" en el chat de WhatsApp que se acaba de abrir para confirmar tu espacio.</strong></p>
+        <p><strong>Por favor, pulsa "Enviar" en el chat de WhatsApp que se abrirá a continuación para confirmar.</strong></p>
         <button class="btn-cerrar" onclick="cerrarModal()">ENTENDIDO</button>
     </div>
 </div>
 
 <div id="seccionAdmin">
-    <h3>📋 Agenda de Luxee Studio</h3>
+    <h3>📋 Agenda Interna - Luxee Studio</h3>
     <div style="margin-bottom: 15px;">
         <button onclick="exportarExcel()" style="background:#28a745; color:white; border:none; padding:10px 15px; border-radius:8px; cursor:pointer; font-weight:bold;">📊 Descargar Excel</button>
         <button onclick="borrarTodo()" style="background:#fff; border:1px solid #ff4d4d; color:#ff4d4d; padding:10px 15px; border-radius:8px; cursor:pointer; margin-left:10px;">Limpiar Todo</button>
@@ -221,7 +232,7 @@
         let serviciosArr = Array.from(document.querySelectorAll('input[name="srv"]:checked'))
                                 .map(cb => cb.value);
 
-        if (serviciosArr.length === 0) return alert("Selecciona al menos un servicio.");
+        if (serviciosArr.length === 0) return alert("Por favor selecciona un servicio.");
 
         if (checkOtros.checked) {
             const index = serviciosArr.indexOf("Otros");
@@ -236,39 +247,34 @@
             hora: document.getElementById('hora').value
         };
 
-        let historial = JSON.parse(localStorage.getItem('luxeeAgendaV7')) || [];
+        // Guardar base de datos
+        let historial = JSON.parse(localStorage.getItem('luxeeAgendaFinal')) || [];
         historial.push(cita);
-        localStorage.setItem('luxeeAgendaV7', JSON.stringify(historial));
+        localStorage.setItem('luxeeAgendaFinal', JSON.stringify(historial));
 
-        const miTelefono = "573142245541"; // CAMBIA EL NÚMERO AQUÍ
+        // Número de WhatsApp (IMPORTANTE: Cambiar aquí)
+        const miTelefono = "573142245541"; 
         const texto = `✨ *NUEVA CITA LUXEE STUDIO* ✨\n\n👤 *Clienta:* ${cita.nombre}\n📞 *Tel:* ${cita.telefono}\n💆‍♀️ *Servicios:* ${cita.servicios}\n📅 *Fecha:* ${cita.fecha}\n⏰ *Hora:* ${cita.hora}`;
         
         window.open(`https://wa.me/${miTelefono}?text=${encodeURIComponent(texto)}`, '_blank');
         
-        // Mostrar mensaje de agradecimiento
         modal.style.display = 'flex';
-        
         mostrarCitas();
         form.reset();
         detalleOtros.style.display = 'none';
     });
 
-    function cerrarModal() {
-        modal.style.display = 'none';
-    }
+    function cerrarModal() { modal.style.display = 'none'; }
 
+    // Acceso secreto (3 clics)
     let clics = 0;
     titulo.addEventListener('click', () => {
         clics++;
-        if (clics === 3) { 
-            admin.style.display = 'block'; 
-            admin.scrollIntoView({ behavior: 'smooth' });
-            clics = 0; 
-        }
+        if (clics === 3) { admin.style.display = 'block'; admin.scrollIntoView({ behavior: 'smooth' }); clics = 0; }
     });
 
     function mostrarCitas() {
-        let historial = JSON.parse(localStorage.getItem('luxeeAgendaV7')) || [];
+        let historial = JSON.parse(localStorage.getItem('luxeeAgendaFinal')) || [];
         const tabla = document.getElementById('cuerpoTabla');
         tabla.innerHTML = "";
         historial.reverse().forEach(c => {
@@ -277,8 +283,8 @@
     }
 
     function exportarExcel() {
-        let historial = JSON.parse(localStorage.getItem('luxeeAgendaV7')) || [];
-        if(historial.length === 0) return alert("No hay citas.");
+        let historial = JSON.parse(localStorage.getItem('luxeeAgendaFinal')) || [];
+        if(historial.length === 0) return alert("No hay datos.");
         let csvContent = "data:text/csv;charset=utf-8,Fecha,Clienta,Telefono,Servicios\n";
         historial.forEach(c => { csvContent += `${c.fecha} ${c.hora},${c.nombre},${c.telefono},"${c.servicios}"\n`; });
         const link = document.createElement("a");
@@ -289,156 +295,8 @@
     }
 
     function borrarTodo() {
-        if(confirm("¿Borrar historial?")) { 
-            localStorage.removeItem('luxeeAgendaV7'); 
-            mostrarCitas(); 
-        }
+        if(confirm("¿Borrar historial?")) { localStorage.removeItem('luxeeAgendaFinal'); mostrarCitas(); }
     }
 </script>
 </body>
-</html>
-    </style>
-</head>
-<body>
-
-<header>
-    <h1 id="tituloLogo">LUXEE STUDIO</h1>
-    <p>BY ELIZA MARTIN</p>
-</header>
-
-<div class="galeria">
-    <div class="foto-item">
-        <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&q=80" alt="Maquillaje">
-        <span>Maquillaje Social</span>
-    </div>
-    <div class="foto-item">
-        <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?auto=format&fit=crop&w=200&q=80" alt="Peinado">
-        <span>Peinados Premium</span>
-    </div>
-    <div class="foto-item">
-        <img src="https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=200&q=80" alt="Uñas">
-        <span>Manicura de Lujo</span>
-    </div>
-</div>
-
-<div class="container">
-    <h3>Agendar tu Cita</h3>
-    <p class="nota-precios">* Los precios se informarán vía WhatsApp al confirmar disponibilidad.</p>
-    
-    <form id="reservaForm">
-        <label>Tu Nombre Completo</label>
-        <input type="text" id="nombre" placeholder="Ej: Maria Giraldo" required>
-
-        <label>Tu WhatsApp (Para contactarte)</label>
-        <input type="tel" id="telCliente" placeholder="Ej: 3001234567" required>
-
-        <label>Servicio</label>
-        <select id="servicio">
-            <option>Maquillaje Profesional</option>
-            <option>Peinado y Estilismo</option>
-            <option>Coloración / Balayage</option>
-            <option>Manicura de Lujo</option>
-        </select>
-
-        <label>Fecha y Hora</label>
-        <div style="display: flex; gap: 10px;">
-            <input type="date" id="fecha" required>
-            <input type="time" id="hora" required>
-        </div>
-
-        <button type="submit" class="btn-whatsapp">RESERVAR POR WHATSAPP 📱</button>
-    </form>
-</div>
-
-<div id="seccionAdmin">
-    <h3>📋 Agenda Interna - Luxee Studio</h3>
-    <table id="tablaCitas">
-        <thead>
-            <tr>
-                <th>Fecha/Hora</th>
-                <th>Clienta</th>
-                <th>Teléfono</th>
-                <th>Servicio</th>
-            </tr>
-        </thead>
-        <tbody id="cuerpoTabla"></tbody>
-    </table>
-    <button class="btn-borrar" onclick="borrarTodo()">Limpiar historial de agenda</button>
-</div>
-
-<script>
-    const form = document.getElementById('reservaForm');
-    const tabla = document.getElementById('cuerpoTabla');
-    const titulo = document.getElementById('tituloLogo');
-    const admin = document.getElementById('seccionAdmin');
-
-    window.onload = mostrarCitas;
-
-    // --- LÓGICA DE FORMULARIO ---
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const cita = {
-            nombre: document.getElementById('nombre').value,
-            telefono: document.getElementById('telCliente').value,
-            servicio: document.getElementById('servicio').value,
-            fecha: document.getElementById('fecha').value,
-            hora: document.getElementById('hora').value
-        };
-
-        // Guardar en local
-        let historial = JSON.parse(localStorage.getItem('citasLuxeeFinal')) || [];
-        historial.push(cita);
-        localStorage.setItem('citasLuxeeFinal', JSON.stringify(historial));
-
-        // Enviar WhatsApp al negocio (Cambia el número abajo)
-        const miTelefono = "573212057113"; 
-        const texto = `✨ *NUEVA CITA LUXEE STUDIO* ✨\n\n` +
-                      `👤 *Clienta:* ${cita.nombre}\n` +
-                      `📞 *Teléfono:* ${cita.telefono}\n` +
-                      `💆‍♀️ *Servicio:* ${cita.servicio}\n` +
-                      `📅 *Fecha:* ${cita.fecha}\n` +
-                      `⏰ *Hora:* ${cita.hora}`;
-        
-        window.open(`https://wa.me/${miTelefono}?text=${encodeURIComponent(texto)}`, '_blank');
-        
-        mostrarCitas();
-        form.reset();
-        alert("¡Solicitud enviada! Se abrirá WhatsApp para finalizar.");
-    });
-
-    // --- LÓGICA DE ADMINISTRACIÓN ---
-    let clics = 0;
-    titulo.addEventListener('click', () => {
-        clics++;
-        if (clics === 3) {
-            admin.style.display = 'block';
-            admin.scrollIntoView({ behavior: 'smooth' });
-            clics = 0;
-        }
-    });
-
-    function mostrarCitas() {
-        let historial = JSON.parse(localStorage.getItem('citasLuxeeFinal')) || [];
-        tabla.innerHTML = "";
-        historial.reverse().forEach(c => {
-            tabla.innerHTML += `
-                <tr>
-                    <td>${c.fecha} | ${c.hora}</td>
-                    <td>${c.nombre}</td>
-                    <td><a href="https://wa.me/${c.telefono}" target="_blank">${c.telefono}</a></td>
-                    <td>${c.servicio}</td>
-                </tr>`;
-        });
-    }
-
-    function borrarTodo() {
-        if(confirm("¿Borrar toda la agenda?")) {
-            localStorage.removeItem('citasLuxeeFinal');
-            mostrarCitas();
-        }
-    }
-</script>
-</body>
-
 </html>
