@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxee Studio - Reserva Premium</title>
+    <style>
+        :root { --dorado: #c5a021; --negro: #121212; --blanco: #ffffff; --gris: #f4f4f4; }
+        body { font-family: 'Helvetica Neue', sans-serif; background-color: var(--gris); margin: 0; color: #333; }
+        
+        header { background: var(--negro); color: var(--dorado); padding: 40px 20px; text-align: center; border-bottom: 4px solid var(--dorado); }
+        header h1 { margin: 0; letter-spacing: 5px; font-size: 2.2em; cursor: pointer; }
+
+        /* Galería */
+        .galeria { display: flex; gap: 15px; padding: 20px; overflow-x: auto; background: white; }
+        .foto-item { min-width: 180px; height: 220px; background: #ddd; border-radius: 12px; overflow: hidden; position: relative; flex-shrink: 0; }
+        .foto-item img { width: 100%; height: 100%; object-fit: cover; }
+        .foto-item span { position: absolute; bottom: 0; background: rgba(0,0,0,0.7); color: var(--dorado); width: 100%; padding: 8px; font-size: 0.75em; text-align: center; font-weight: bold; }
+
+        .container { max-width: 450px; margin: -20px auto 20px; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; z-index: 10; }
+        
+        h3 { color: var(--negro); border-bottom: 2px solid var(--dorado); display: inline-block; padding-bottom: 5px; }
+        .nota-precios { font-style: italic; font-size: 0.85em; color: #777; margin-bottom: 15px; }
+
+        label { display: block; margin-top: 15px; font-weight: 600; font-size: 0.9em; }
+        input, select, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; box-sizing: border-box; }
+        
+        .btn-whatsapp { background: var(--negro); color: var(--dorado); border: 2px solid var(--dorado); font-weight: bold; cursor: pointer; margin-top: 25px; transition: 0.3s; }
+        .btn-whatsapp:hover { background: var(--dorado); color: white; }
+
+        /* Panel Administrativo Oculto */
+        #seccionAdmin { display: none; max-width: 900px; margin: 40px auto; padding: 20px; background: white; border-radius: 15px; overflow-x: auto; border: 2px dashed var(--dorado); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 600px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 0.9em; }
+        th { color: var(--dorado); background: #1a1a1a; }
+        .btn-borrar { background: #ffeded; color: #d9534f; border: 1px solid #d9534f; padding: 5px 10px; cursor: pointer; margin-top: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 id="tituloLogo">LUXEE STUDIO</h1>
+    <p>BY ELIZA MARTIN</p>
+</header>
+
+<div class="galeria">
+    <div class="foto-item">
+        <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&q=80" alt="Maquillaje">
+        <span>Maquillaje Social</span>
+    </div>
+    <div class="foto-item">
+        <img src="https://images.unsplash.com/photo-1560869713-7d0a29430803?auto=format&fit=crop&w=200&q=80" alt="Peinado">
+        <span>Peinados Premium</span>
+    </div>
+    <div class="foto-item">
+        <img src="https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=200&q=80" alt="Uñas">
+        <span>Manicura de Lujo</span>
+    </div>
+</div>
+
+<div class="container">
+    <h3>Agendar tu Cita</h3>
+    <p class="nota-precios">* Los precios se informarán vía WhatsApp al confirmar disponibilidad.</p>
+    
+    <form id="reservaForm">
+        <label>Tu Nombre Completo</label>
+        <input type="text" id="nombre" placeholder="Ej: Maria Giraldo" required>
+
+        <label>Tu WhatsApp (Para contactarte)</label>
+        <input type="tel" id="telCliente" placeholder="Ej: 3001234567" required>
+
+        <label>Servicio</label>
+        <select id="servicio">
+            <option>Maquillaje Profesional</option>
+            <option>Peinado y Estilismo</option>
+            <option>Coloración / Balayage</option>
+            <option>Manicura de Lujo</option>
+        </select>
+
+        <label>Fecha y Hora</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="date" id="fecha" required>
+            <input type="time" id="hora" required>
+        </div>
+
+        <button type="submit" class="btn-whatsapp">RESERVAR POR WHATSAPP 📱</button>
+    </form>
+</div>
+
+<div id="seccionAdmin">
+    <h3>📋 Agenda Interna - Luxee Studio</h3>
+    <table id="tablaCitas">
+        <thead>
+            <tr>
+                <th>Fecha/Hora</th>
+                <th>Clienta</th>
+                <th>Teléfono</th>
+                <th>Servicio</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpoTabla"></tbody>
+    </table>
+    <button class="btn-borrar" onclick="borrarTodo()">Limpiar historial de agenda</button>
+</div>
+
+<script>
+    const form = document.getElementById('reservaForm');
+    const tabla = document.getElementById('cuerpoTabla');
+    const titulo = document.getElementById('tituloLogo');
+    const admin = document.getElementById('seccionAdmin');
+
+    window.onload = mostrarCitas;
+
+    // --- LÓGICA DE FORMULARIO ---
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const cita = {
+            nombre: document.getElementById('nombre').value,
+            telefono: document.getElementById('telCliente').value,
+            servicio: document.getElementById('servicio').value,
+            fecha: document.getElementById('fecha').value,
+            hora: document.getElementById('hora').value
+        };
+
+        // Guardar en local
+        let historial = JSON.parse(localStorage.getItem('citasLuxeeFinal')) || [];
+        historial.push(cita);
+        localStorage.setItem('citasLuxeeFinal', JSON.stringify(historial));
+
+        // Enviar WhatsApp al negocio (Cambia el número abajo)
+        const miTelefono = "573212057113"; 
+        const texto = `✨ *NUEVA CITA LUXEE STUDIO* ✨\n\n` +
+                      `👤 *Clienta:* ${cita.nombre}\n` +
+                      `📞 *Teléfono:* ${cita.telefono}\n` +
+                      `💆‍♀️ *Servicio:* ${cita.servicio}\n` +
+                      `📅 *Fecha:* ${cita.fecha}\n` +
+                      `⏰ *Hora:* ${cita.hora}`;
+        
+        window.open(`https://wa.me/${miTelefono}?text=${encodeURIComponent(texto)}`, '_blank');
+        
+        mostrarCitas();
+        form.reset();
+        alert("¡Solicitud enviada! Se abrirá WhatsApp para finalizar.");
+    });
+
+    // --- LÓGICA DE ADMINISTRACIÓN ---
+    let clics = 0;
+    titulo.addEventListener('click', () => {
+        clics++;
+        if (clics === 3) {
+            admin.style.display = 'block';
+            admin.scrollIntoView({ behavior: 'smooth' });
+            clics = 0;
+        }
+    });
+
+    function mostrarCitas() {
+        let historial = JSON.parse(localStorage.getItem('citasLuxeeFinal')) || [];
+        tabla.innerHTML = "";
+        historial.reverse().forEach(c => {
+            tabla.innerHTML += `
+                <tr>
+                    <td>${c.fecha} | ${c.hora}</td>
+                    <td>${c.nombre}</td>
+                    <td><a href="https://wa.me/${c.telefono}" target="_blank">${c.telefono}</a></td>
+                    <td>${c.servicio}</td>
+                </tr>`;
+        });
+    }
+
+    function borrarTodo() {
+        if(confirm("¿Borrar toda la agenda?")) {
+            localStorage.removeItem('citasLuxeeFinal');
+            mostrarCitas();
+        }
+    }
+</script>
+</body>
+</html>
